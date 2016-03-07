@@ -1,25 +1,20 @@
-# This is a template for a Ruby scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+require 'scraperwiki'
+require 'mechanize'
 
-# require 'scraperwiki'
-# require 'mechanize'
-#
-# agent = Mechanize.new
-#
-# # Read in a page
-# page = agent.get("http://foo.com")
-#
-# # Find somehing on the page using css selectors
-# p page.at('div.content')
-#
-# # Write out to the sqlite database using scraperwiki library
-# ScraperWiki.save_sqlite(["name"], {"name" => "susan", "occupation" => "software developer"})
-#
-# # An arbitrary query against the database
-# ScraperWiki.select("* from data where 'name'='peter'")
+agent = Mechanize.new
+page  = agent.get('http://bookstore.yahoo.co.jp/free_magazine-166178/')
+lis   = page.search('#provideBooksList > li')
 
-# You don't have to do things with the Mechanize or ScraperWiki libraries.
-# You can use whatever gems you want: https://morph.io/documentation/ruby
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+p lis.size
+
+data = lis.map do |li|
+  a = li.at('.provideBooksTitle > a')
+  {:link    => a['href'],
+   :title   => a.text,
+   :content => li.at('.provideBooksText').text,
+   :author  => li.at('.author').text,
+   :date    => li.at('.term0Magazine').text.scan(/\d+/)[0..2]*'-'+'T00:00:00Z',
+  }
+end
+
+ScraperWiki.save_sqlite [:link], data
