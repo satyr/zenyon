@@ -9,7 +9,8 @@ p lis.size
 
 data = lis.map do |li|
   a = li.at('.provideBooksTitle > a')
-  {:link    => a['href'],
+  {:link    => 'http://viewer.bookstore.yahoo.co.jp/?u0=3&cid=' +
+               a['href'][/\d+/],
    :title   => a.text,
    :content => li.at('.provideBooksText').text,
    :author  => li.at('.author').text,
