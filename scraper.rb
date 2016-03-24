@@ -14,7 +14,8 @@ data = lis.map do |li|
    :title   => a.text,
    :content => li.at('.provideBooksText').text,
    :author  => li.at('.author').text,
-   :date    => li.at('.term0Magazine').text.scan(/\d+/)[0..2]*'-'+'T00:00:00Z',
+   :date    => li.at('.term0Magazine').text.scan(/\d+/)[0..2].join('-')
+               .sub(/\b\d\b/, '0\&') + 'T00:00:00Z',
   }
 end
 
